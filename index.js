@@ -1,25 +1,41 @@
 // index.js
 import express from "express";
+import dotenv from "dotenv";
+dotenv.config();
 import cors from "cors";
 import http from "http";
 import restRoutes from "./routes/rest.js";
-import { startBinanceStream } from "./services/binance.js";
+// import { startBinanceStream } from "./services/binance.js";
 import { setupLiveServer } from "./routes/live.js";
-import { updateMarketCaps } from "./services/marketData.js";
+import { initData } from "./services/marketData.js";
+import connectToMongo from "./config/db.js";
+import "./jobs/updater.js";
+// import { getCoinData } from "./cache/dataStore.js";
+
 
 const app = express();
 app.use(cors());
-app.use("/api", restRoutes);
+
 
 const server = http.createServer(app);
 setupLiveServer(server);
 
-// Start services
-startBinanceStream();
-setInterval(updateMarketCaps, 10 * 60 * 1000); // every 10 minutes
-updateMarketCaps();
+(async () => {
+  await connectToMongo();
+  await initData(); // fill cache from DB or fetch new data
+})();
 
-// updateCoinGeckoData();
-// setInterval(updateCoinGeckoData, 10 * 60 * 1000); // update every 10 min
+app.use("/api", restRoutes);
+
+// (async function init() {
+//   console.log("📄 Fetching CoinGecko metadata (top 1000)...");
+//   await updateMarketCaps(); // <- fills coinData with id, name, image, rank, etc.
+
+//   console.log("🚀 Starting Binance WS to update live prices...");
+//   startBinanceStream(); // now it will merge into existing entries rather than create minimal ones
+
+//   // schedule periodic metadata refresh
+//   setInterval(updateMarketCaps, 10 * 60 * 1000);
+// })();
 
 server.listen(4000, () => console.log("Crypto Data API running on port 4000"));

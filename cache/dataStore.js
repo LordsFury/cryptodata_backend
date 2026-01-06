@@ -1,8 +1,11 @@
-let coinData = {};
+// cache/dataStore.js
+const coinData = {}; // shared in-memory cache
 
+// ✅ getter (returns live object reference)
 export const getCoinData = () => coinData;
 
-export const setCoinData = (symbol, data) => {
-  const key = symbol.toUpperCase();
-  coinData[key] = { symbol: key, ...coinData[key], ...data };
+// ✅ setter (adds or updates only this symbol)
+export const setCoinData = (id, data) => {
+  const key = `SYM_${id.toUpperCase()}`;
+  coinData[key] = { ...coinData[key], ...data };
 };

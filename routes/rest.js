@@ -1,10 +1,19 @@
 import express from "express";
 import { getCoinData } from "../cache/dataStore.js";
+import CoinModel from "../models/CoinModel.js";
 const router = express.Router();
 
-router.get("/tickers", (req, res) => {
-  const data = Object.values(getCoinData());
-  res.json(data);
+router.get("/tickers", async (req, res) => {
+  const cache = getCoinData();
+  const cacheValues = Object.values(cache);
+
+  if (cacheValues.length > 0) {
+    return res.json(cacheValues.sort((a, b) => a.rank - b.rank));
+  }
+
+  // Fallback: fetch from DB if cache empty
+  const dbCoins = await CoinModel.find().sort({ rank: 1 });
+  return res.json(dbCoins);
 });
 
 router.get("/top/:n", async (req, res) => {
