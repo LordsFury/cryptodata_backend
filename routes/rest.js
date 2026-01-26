@@ -3,6 +3,7 @@ import { getCoinData } from "../cache/dataStore.js";
 import CoinModel from "../models/CoinModel.js";
 const router = express.Router();
 
+// Health check with coin count
 router.get("/health", (req, res) => {
   const coinCount = Object.keys(getCoinData()).length;
   
