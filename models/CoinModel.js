@@ -55,6 +55,18 @@ const CoinSchema = new mongoose.Schema({
         required: true,
         index: true
     },
+    circulating_supply: {
+        type: Number,
+        required: true
+    },
+    total_supply: {
+        type: Number,
+        required: true
+    },
+    max_supply: {
+        type: Number,
+        required: false
+    },
 
 }, { timestamps: true });
 

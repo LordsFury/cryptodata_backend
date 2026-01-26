@@ -3,6 +3,17 @@ import { getCoinData } from "../cache/dataStore.js";
 import CoinModel from "../models/CoinModel.js";
 const router = express.Router();
 
+router.get("/health", (req, res) => {
+  const coinCount = Object.keys(getCoinData()).length;
+  
+  res.json({ 
+    status: coinCount > 0 ? "ok" : "initializing",
+    timestamp: Date.now(),
+    uptime: process.uptime(),
+    coins_loaded: coinCount
+  });
+});
+
 router.get("/tickers", async (req, res) => {
   const cache = getCoinData();
   const cacheValues = Object.values(cache);

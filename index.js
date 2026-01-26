@@ -12,10 +12,8 @@ import connectToMongo from "./config/db.js";
 import "./jobs/updater.js";
 // import { getCoinData } from "./cache/dataStore.js";
 
-
 const app = express();
 app.use(cors());
-
 
 const server = http.createServer(app);
 setupLiveServer(server);
@@ -24,6 +22,16 @@ setupLiveServer(server);
   await connectToMongo();
   await initData(); // fill cache from DB or fetch new data
 })();
+
+// ============== HEALTH CHECK ENDPOINT ==============
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    timestamp: Date.now(),
+    uptime: process.uptime()
+  });
+});
+// ============== END HEALTH CHECK ==============
 
 app.use("/api", restRoutes);
 
@@ -38,4 +46,4 @@ app.use("/api", restRoutes);
 //   setInterval(updateMarketCaps, 10 * 60 * 1000);
 // })();
 
-server.listen(4000, () => console.log("Crypto Data API running on port 4000"));
+server.listen(4000, () => console.log("✅ Crypto Data API running on port 4000"));
